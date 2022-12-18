@@ -22,6 +22,12 @@ void VERBOSE() {
     printf("[VERBOSE] %s\n", logBuffer);
 }
 
+char tmp[LOG_SIZE];
+void VERBOSE1() {
+    if (verboseMode != 1) return;
+    printf("[VERBOSE] %s\n", tmp);
+}
+
 void INFO() {
     printf("[INFO] %s\n", logBuffer);
 }
@@ -59,7 +65,9 @@ int _traverseToDirectory(char *path) {
 
         sprintf(logBuffer, "looking up child entry %s in parent directory (inode=%d)", dirname, dirInode); VERBOSE();
         dirInode = MFS_Lookup(dirInode, dirname);
-        sprintf(logBuffer, "Found child entry with inode number %d", dirInode); VERBOSE();
+        sprintf(logBuffer, "dirInode: = %d dirname = %s 68\n", dirInode, dirname); INFO();
+
+        sprintf(logBuffer, "Found child entry with inode number %d", dirInode); INFO();
         
         if (dirInode == -1) {
             sprintf(logBuffer, "Unable to enter %s", dirname); ERR();
@@ -145,7 +153,7 @@ int perform_insert(const char *fromPath, char *toPath) {
         sprintf(logBuffer, "Unable to create new file %s in %s", fileName, dirPath); ERR();
     }
 
-    int newInode = MFS_Lookup(dirInode, fileName);
+   /* int newInode = MFS_Lookup(dirInode, fileName);
     if (newInode == -1) {
         sprintf(logBuffer, "Unable to fetch newly created inode number even though MFS_Creat was successful"); ERR();
     }
@@ -174,7 +182,7 @@ int perform_insert(const char *fromPath, char *toPath) {
     }
 
     sprintf(logBuffer, "Completed all write operations. Written a total of %d bytes", offset); INFO();
-
+*/
     free(dirPath);
     return 0;
 }
@@ -185,8 +193,12 @@ int perform_cat(char *path) {
     char *fileName = path + fnameSep + 1;
 
     int dirInode = _traverseToDirectory(dirPath);
+    sprintf(logBuffer, "dirInode: = %d\n", dirInode); INFO();
+    //int fileInode   = dirInode;
 
     int fileInode = MFS_Lookup(dirInode, fileName);
+    sprintf(logBuffer, "fileInode: = %d file name = %s\n", fileInode, fileName); INFO();
+
     if (fileInode == -1) {
         sprintf(logBuffer, "Unable to lookup file %s in directory (inum=%d)", fileName, dirInode); ERR();
     }
@@ -226,7 +238,10 @@ int perform_cat(char *path) {
     free(dirPath);
     return 0;
 }
-
+int perform_shutdown() {
+     int rc = MFS_Shutdown();
+     return 0;
+}
 // similar to mkdir -p. Just bulldoze through and call MFS_Creat for all
 // subdirectories. If name already exists, should not overwrite.
 int perform_mkdir(char *path) {
@@ -245,12 +260,20 @@ int perform_mkdir(char *path) {
         }
 
         sprintf(logBuffer, "calling MFS_Creat for %s in parent directory (inode=%d)", dirname, dirInode); VERBOSE();
-        int rc = MFS_Creat(dirInode, UFS_DIRECTORY, dirname);
+        int rc = MFS_Creat(dirInode, UFS_REGULAR_FILE, dirname);
         if (rc == -1) {
+        sprintf(logBuffer, "rc for create returned -1"); VERBOSE();
+
             sprintf(logBuffer, "Unable to create directory %s", dirname); ERR();
+        }
+        else {
+             sprintf(logBuffer, "rc for create returned 0"); VERBOSE();
+            printf("create returned %d= ",rc);VERBOSE();
         }
 
         int newInode = MFS_Lookup(dirInode, dirname);
+        sprintf(logBuffer, "lookup ret code: %d", newInode);VERBOSE();
+       // printf("lookup is being called now");VERBOSE();
         if (newInode == -1) {
             sprintf(logBuffer, "Unable to fetch newly created directory inode even though MFS_Creat was successful"); ERR();
         }
@@ -263,7 +286,8 @@ int perform_mkdir(char *path) {
         };
         dirname = strtok(NULL, "/");
     }
-    sprintf(logBuffer, "mkdir completed successfully"); INFO();
+    //sprintf(logBuffer, "mkdir completed successfully"); INFO();
+    
     free(path);
     return 0;
 }
@@ -337,7 +361,11 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(cmd, "mkdir") == 0) {
         _assert_argc(argc, 2 + 3);
         perform_mkdir(argv[4]);
-    } else {
+    } else if (strcmp(cmd, "shutdown") == 0) {
+        //_assert_argc(argc, 2 + 3);
+        perform_shutdown();
+    }  
+    else {
         printf("Command not found! run ./mfscli for usage help\n");
         return -1;
     }

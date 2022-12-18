@@ -1,0 +1,2438 @@
+('starting', 'build')
+
+**********************************************************************
+
+Test build
+build project using make
+
+**********************************************************************
+Trying to build project using make
+make
+make -f Makefile.libmfs
+make[1]: Entering directory '/tmp/tmpGCgqBB/p'
+make[1]: 'libmfs.so' is up to date.
+make[1]: Leaving directory '/tmp/tmpGCgqBB/p'
+
+
+test build PASSED
+ (build project using make)
+
+('starting', 'shutdown')
+
+**********************************************************************
+
+Test shutdown
+init server and client then call shutdown
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 8068
+/tmp/tmpGCgqBB/p/server 8068 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "6"
+
+
+test shutdown PASSED
+ (init server and client then call shutdown)
+
+('starting', 'creat')
+
+**********************************************************************
+
+Test creat
+creat a file and check with lookup
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 7008
+/tmp/tmpGCgqBB/p/server 7008 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '4~0~1~test')
+hello
+inode num = 1, type = 1,  size = 0parent inode size before: 64parent inode size after: 96
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '0~0~test')
+its in case 0 mkdir
+ look up success : 0 for file =  test 114
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '1')
+CLIENT:: sent message (4096) "6"
+
+
+test creat PASSED
+ (creat a file and check with lookup)
+
+('starting', 'write')
+
+**********************************************************************
+
+Test write
+write then read one block
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 9035
+/tmp/tmpGCgqBB/p/server 9035 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '1')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 1~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 1')
+CLIENT:: sent message (4096) "3~1~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 1')
+buffer in mfs read = START BLOCK 1
+('START BLOCK 1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00END BLOCK 1')
+('\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+Failure: Corrupt data returned by read
+
+
+test write FAILED
+ (write then read one block)
+ Corrupt data returned by read
+
+('starting', 'stat')
+
+**********************************************************************
+
+Test stat
+stat a regular file
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 8068
+/tmp/tmpGCgqBB/p/server 8068 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '1')
+CLIENT:: sent message (4096) "1~0"
+CLIENT:: read 4096 bytes (message: '0~0~96')
+CLIENT:: STAT SUCCESSFUL
+type= 0  size =96
+CLIENT:: sent message (4096) "1~1"
+CLIENT:: read 4096 bytes (message: '0~1~4096')
+CLIENT:: STAT SUCCESSFUL
+type= 1  size =4096
+Failure: Stat gave wrong size
+
+
+test stat FAILED
+ (stat a regular file)
+ Stat gave wrong size
+
+('starting', 'overwrite')
+
+**********************************************************************
+
+Test overwrite
+overwrite a block
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 6955
+/tmp/tmpGCgqBB/p/server 6955 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '1')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 1~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 1')
+CLIENT:: sent message (4096) "3~1~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 1')
+buffer in mfs read = START BLOCK 1
+Failure: Corrupt data returned by read
+
+
+test overwrite FAILED
+ (overwrite a block)
+ Corrupt data returned by read
+
+('starting', 'maxfile')
+
+**********************************************************************
+
+Test maxfile
+write largest possible file
+
+**********************************************************************
+total blocks        39
+  inodes            128 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 7801
+/tmp/tmpGCgqBB/p/server 7801 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '1')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 0~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 0')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 1~4096~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 2~8192~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 3~12288~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 4~16384~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 5~20480~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 6~24576~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 7~28672~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 8~32768~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 9~36864~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 10~40960~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 11~45056~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 12~49152~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 13~53248~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 14~57344~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 15~61440~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 16~65536~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 17~69632~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 18~73728~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 19~77824~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 20~81920~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 21~86016~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 22~90112~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 23~94208~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 24~98304~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 25~102400~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 26~106496~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 27~110592~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 28~114688~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 29~118784~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+CLIENT:: sent message (4096) "3~1~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 0')
+buffer in mfs read = START BLOCK 0
+Failure: Corrupt data returned by read
+
+
+test maxfile FAILED
+ (write largest possible file)
+ Corrupt data returned by read
+
+('starting', 'maxfile2')
+
+**********************************************************************
+
+Test maxfile2
+write more blocks than possible
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 9846
+/tmp/tmpGCgqBB/p/server 9846 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '1')
+31
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 0~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 0')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 1~4096~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 2~8192~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 3~12288~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 4~16384~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 5~20480~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 6~24576~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 7~28672~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 8~32768~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 13
+CLIENT:: sent message (8192) "2~1~START BLOCK 9~36864~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 10~40960~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 11~45056~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 12~49152~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 13~53248~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 14~57344~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 15~61440~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 16~65536~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 17~69632~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 18~73728~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 19~77824~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 20~81920~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 21~86016~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 22~90112~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 23~94208~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 24~98304~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 25~102400~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 26~106496~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 27~110592~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 28~114688~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 29~118784~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+write more than need
+size of buf 14
+CLIENT:: sent message (8192) "2~1~START BLOCK 30~122880~4096"
+CLIENT:: read 4096 bytes (message: '0~')
+Failure: MFS_Write should fail on inalid block number
+
+
+test maxfile2 FAILED
+ (write more blocks than possible)
+ MFS_Write should fail on inalid block number
+
+('starting', 'dir1')
+
+**********************************************************************
+
+Test dir1
+check root for dot entries
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 8011
+/tmp/tmpGCgqBB/p/server 8011 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '0~0~.')
+its in case 0 mkdir
+ look up success : 0 for file =  . 114
+SERVER:: read 4096 bytes (message: '0~0~..')
+its in case 0 mkdir
+ look up success : 0 for file =  .. 114
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "0~0~."
+CLIENT:: read 4096 bytes (message: '0')
+CLIENT:: sent message (4096) "0~0~.."
+CLIENT:: read 4096 bytes (message: '0')
+CLIENT:: sent message (4096) "6"
+
+
+test dir1 PASSED
+ (check root for dot entries)
+
+('starting', 'dir2')
+
+**********************************************************************
+
+Test dir2
+create a new directory and check it
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 9376
+/tmp/tmpGCgqBB/p/server 9376 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '4~0~0~testdir')
+hello
+creating directory...
+parent inode size before: 96parent inode size after: 128This is parent  num directory block = 4
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '0~0~testdir')
+its in case 0 mkdir
+ look up success : 0 for file =  testdir 114
+SERVER:: read 4096 bytes (message: '0~2~.')
+its in case 0 mkdir
+ look up success : 0 for file =  . 114
+SERVER:: read 4096 bytes (message: '0~2~..')
+its in case 0 mkdir
+ look up success : 0 for file =  .. 114
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "4~0~0~testdir"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~testdir"
+CLIENT:: read 4096 bytes (message: '2')
+CLIENT:: sent message (4096) "0~2~."
+CLIENT:: read 4096 bytes (message: '2')
+CLIENT:: sent message (4096) "0~2~.."
+CLIENT:: read 4096 bytes (message: '0')
+CLIENT:: sent message (4096) "6"
+
+
+test dir2 PASSED
+ (create a new directory and check it)
+
+('starting', 'baddir')
+
+**********************************************************************
+
+Test baddir
+try to create a file with a file parent inode
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 8350
+/tmp/tmpGCgqBB/p/server 8350 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~testdir"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~testdir"
+CLIENT:: read 4096 bytes (message: '2')
+CLIENT:: sent message (4096) "4~2~1~testfile"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+Failure: MFS_Creat should fail if pinum is not a directory
+
+
+test baddir FAILED
+ (try to create a file with a file parent inode)
+ MFS_Creat should fail if pinum is not a directory
+
+('starting', 'baddir2')
+
+**********************************************************************
+
+Test baddir2
+try to lookup a file with a file parent inode
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 6658
+/tmp/tmpGCgqBB/p/server 6658 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~testdir"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~testdir"
+CLIENT:: read 4096 bytes (message: '2')
+CLIENT:: sent message (4096) "0~2~testfile"
+CLIENT:: read 4096 bytes (message: '3')
+Failure: MFS_Lookup should fail if pinum is not a directory
+
+
+test baddir2 FAILED
+ (try to lookup a file with a file parent inode)
+ MFS_Lookup should fail if pinum is not a directory
+
+('starting', 'unlink')
+
+**********************************************************************
+
+Test unlink
+unlink a file
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 6723
+/tmp/tmpGCgqBB/p/server 6723 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '4~0~1~test')
+hello
+
+response from server which is not sent: 0   158
+SERVER:: read 4096 bytes (message: '0~0~test')
+its in case 0 mkdir
+ look up success : 0 for file =  test 114
+SERVER:: read 4096 bytes (message: '5~0~test')
+SERVER:: read 4096 bytes (message: '0~0~test')
+its in case 0 mkdir
+ couldnt find child dir: -1   158
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '1')
+CLIENT:: sent message (4096) "5~0~test"
+CLIENT:: read 4096 bytes (message: '0')
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '-1')
+CLIENT:: sent message (4096) "6"
+
+
+test unlink PASSED
+ (unlink a file)
+
+('starting', 'unlink2')
+
+**********************************************************************
+
+Test unlink2
+unlink a directory
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 7890
+/tmp/tmpGCgqBB/p/server 7890 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '4~0~0~test')
+hello
+creating directory...
+parent inode size before: 128parent inode size after: 160This is parent  num directory block = 4
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '0~0~test')
+its in case 0 mkdir
+ look up success : 0 for file =  test 114
+SERVER:: read 4096 bytes (message: '5~0~test')
+SERVER:: read 4096 bytes (message: '0~0~test')
+its in case 0 mkdir
+ couldnt find child dir: -1   158
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "4~0~0~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '4')
+CLIENT:: sent message (4096) "5~0~test"
+CLIENT:: read 4096 bytes (message: '0')
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '-1')
+CLIENT:: sent message (4096) "6"
+
+
+test unlink2 PASSED
+ (unlink a directory)
+
+('starting', 'empty')
+
+**********************************************************************
+
+Test empty
+unlink a non-empty directory
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 6357
+/tmp/tmpGCgqBB/p/server 6357 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '4~0~0~testdir')
+hello
+
+response from server which is not sent: 0   158
+SERVER:: read 4096 bytes (message: '0~0~testdir')
+its in case 0 mkdir
+ look up success : 0 for file =  testdir 114
+SERVER:: read 4096 bytes (message: '4~2~1~testfile')
+hello
+
+response from server which is not sent: 0   158
+SERVER:: read 4096 bytes (message: '0~2~testfile')
+its in case 0 mkdir
+ look up success : 0 for file =  testfile 114
+SERVER:: read 4096 bytes (message: '5~0~testdir')
+SERVER:: read 4096 bytes (message: '5~2~testfile')
+SERVER:: read 4096 bytes (message: '5~0~testdir')
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "4~0~0~testdir"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~testdir"
+CLIENT:: read 4096 bytes (message: '2')
+CLIENT:: sent message (4096) "4~2~1~testfile"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~2~testfile"
+CLIENT:: read 4096 bytes (message: '3')
+CLIENT:: sent message (4096) "5~0~testdir"
+CLIENT:: read 4096 bytes (message: '-1')
+CLIENT:: sent message (4096) "5~2~testfile"
+CLIENT:: read 4096 bytes (message: '0')
+CLIENT:: sent message (4096) "5~0~testdir"
+CLIENT:: read 4096 bytes (message: '0')
+CLIENT:: sent message (4096) "6"
+
+
+test empty PASSED
+ (unlink a non-empty directory)
+
+('starting', 'name')
+
+**********************************************************************
+
+Test name
+name too long
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 9245
+/tmp/tmpGCgqBB/p/server 9245 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '4~0~1~AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+hello
+response from server which is not sent: -1   137
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+CLIENT:: sent message (4096) "4~0~1~AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+CLIENT:: read 4096 bytes (message: '-1')
+response buffer = -1
+CLIENT:: sent message (4096) "6"
+
+
+test name PASSED
+ (name too long)
+
+('starting', 'persist')
+
+**********************************************************************
+
+Test persist
+restart server after creating a file
+
+**********************************************************************
+total blocks        36
+  inodes            32 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 5195
+/tmp/tmpGCgqBB/p/server 5195 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~1~test"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '5')
+size of buf 13
+CLIENT:: sent message (8192) "2~5~START BLOCK 1~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 1')
+CLIENT:: sent message (4096) "0~0~test"
+CLIENT:: read 4096 bytes (message: '5')
+CLIENT:: sent message (4096) "3~5~0~4096"
+CLIENT:: read 4096 bytes (message: '0~START BLOCK 1')
+buffer in mfs read = START BLOCK 1
+Failure: Corrupt data returned by read
+
+
+test persist FAILED
+ (restart server after creating a file)
+ Corrupt data returned by read
+
+('starting', 'bigdir')
+
+**********************************************************************
+
+Test bigdir
+create a directory with 126 files
+
+**********************************************************************
+total blocks        39
+  inodes            128 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 8112
+/tmp/tmpGCgqBB/p/server 8112 /home/keerthi/os-fall22/p4/remzi/test.img
+SERVER:: read 4096 bytes (message: '4~0~0~testdir')
+hello
+creating directory...
+parent inode size before: 192parent inode size after: 224This is parent  num directory block = 4
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '0~0~testdir')
+its in case 0 mkdir
+ look up success : 0 for file =  testdir 114
+SERVER:: read 4096 bytes (message: '4~6~1~0')
+hello
+inode num = 7, type = 1,  size = 0parent inode size before: 64parent inode size after: 96
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~1')
+hello
+inode num = 8, type = 1,  size = 0parent inode size before: 96parent inode size after: 128
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~2')
+hello
+inode num = 9, type = 1,  size = 0parent inode size before: 128parent inode size after: 160
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~3')
+hello
+inode num = 10, type = 1,  size = 0parent inode size before: 160parent inode size after: 192
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~4')
+hello
+inode num = 11, type = 1,  size = 0parent inode size before: 192parent inode size after: 224
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~5')
+hello
+inode num = 12, type = 1,  size = 0parent inode size before: 224parent inode size after: 256
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~6')
+hello
+inode num = 13, type = 1,  size = 0parent inode size before: 256parent inode size after: 288
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~7')
+hello
+inode num = 14, type = 1,  size = 0parent inode size before: 288parent inode size after: 320
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~8')
+hello
+inode num = 15, type = 1,  size = 0parent inode size before: 320parent inode size after: 352
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~9')
+hello
+inode num = 16, type = 1,  size = 0parent inode size before: 352parent inode size after: 384
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~10')
+hello
+inode num = 17, type = 1,  size = 0parent inode size before: 384parent inode size after: 416
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~11')
+hello
+inode num = 18, type = 1,  size = 0parent inode size before: 416parent inode size after: 448
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~12')
+hello
+inode num = 19, type = 1,  size = 0parent inode size before: 448parent inode size after: 480
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~13')
+hello
+inode num = 20, type = 1,  size = 0parent inode size before: 480parent inode size after: 512
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~14')
+hello
+inode num = 21, type = 1,  size = 0parent inode size before: 512parent inode size after: 544
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~15')
+hello
+inode num = 22, type = 1,  size = 0parent inode size before: 544parent inode size after: 576
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~16')
+hello
+inode num = 23, type = 1,  size = 0parent inode size before: 576parent inode size after: 608
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~17')
+hello
+inode num = 24, type = 1,  size = 0parent inode size before: 608parent inode size after: 640
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~18')
+hello
+inode num = 25, type = 1,  size = 0parent inode size before: 640parent inode size after: 672
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~19')
+hello
+inode num = 26, type = 1,  size = 0parent inode size CLIENT:: sent message (4096) "4~0~0~testdir"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~testdir"
+CLIENT:: read 4096 bytes (message: '6')
+CLIENT:: sent message (4096) "4~6~1~0"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~1"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~2"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~3"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~4"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~5"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~6"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~7"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~8"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~9"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~10"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~11"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~12"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~13"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~14"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~15"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~16"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~17"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~18"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~19"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~20"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~21"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~22"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~23"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~24"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~25"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~26"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~27"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~28"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~29"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~30"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~31"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~32"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~33"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~34"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~35"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~36"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~37"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~38"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent messbefore: 672parent inode size after: 704
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~20')
+hello
+inode num = 27, type = 1,  size = 0parent inode size before: 704parent inode size after: 736
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~21')
+hello
+inode num = 28, type = 1,  size = 0parent inode size before: 736parent inode size after: 768
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~22')
+hello
+inode num = 29, type = 1,  size = 0parent inode size before: 768parent inode size after: 800
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~23')
+hello
+inode num = 30, type = 1,  size = 0parent inode size before: 800parent inode size after: 832
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~24')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 832parent inode size after: 864
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~25')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 864parent inode size after: 896
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~26')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 896parent inode size after: 928
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~27')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 928parent inode size after: 960
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~28')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 960parent inode size after: 992
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~29')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 992parent inode size after: 1024
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~30')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1024parent inode size after: 1056
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~31')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1056parent inode size after: 1088
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~32')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1088parent inode size after: 1120
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~33')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1120parent inode size after: 1152
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~34')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1152parent inode size after: 1184
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~35')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1184parent inode size after: 1216
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~36')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1216parent inode size after: 1248
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~37')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1248parent inode size after: 1280
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~38')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1280parent inode size after: 1312
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~39')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1312parent inode size after: 1344
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~40')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1344parent inode size after: 1376
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~41')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1376parent inode size after: 1408
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~42')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1408parent inode size after: 1440
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~43')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1440parent inode size after: 1472
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~44')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1472parent inode size after: 1504
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~45')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1504parent inode size after: 1536
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~46')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1536parent inode size after: 1568
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~47')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1568parent inode size after: 1600
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~48')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1600parent inode size after: 1632
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~49')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1632parent inode size after: 1664
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~50')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1664parent inode size after: 1696
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~51')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1696parent inode size after: 1728
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~52')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1728parent inode size after: 1760
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~53')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1760parent inode size after: 1792
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~54')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1792parent inode size after: 1824
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~55')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1824parent inode size after: 1856
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~56')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1856parent inode size after: 1888
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~57')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1888parent inode size after: 1920
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~58')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1920parent inode size after: 1952
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~59')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1952parent inode size after: 1984
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~60')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 1984parent inode size after: 2016
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~61')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2016parent inodage (4096) "4~6~1~39"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~40"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~41"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~42"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~43"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~44"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~45"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~46"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~47"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~48"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~49"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~50"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~51"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~52"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~53"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~54"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~55"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~56"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~57"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~58"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~59"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~60"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~61"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~62"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~63"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~64"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~65"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~66"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~67"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~68"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~69"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~70"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~71"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~72"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~73"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~74"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~75"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~76"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~77"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~78"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~79"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent e size after: 2048
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~62')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2048parent inode size after: 2080
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~63')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2080parent inode size after: 2112
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~64')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2112parent inode size after: 2144
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~65')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2144parent inode size after: 2176
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~66')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2176parent inode size after: 2208
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~67')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2208parent inode size after: 2240
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~68')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2240parent inode size after: 2272
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~69')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2272parent inode size after: 2304
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~70')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2304parent inode size after: 2336
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~71')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2336parent inode size after: 2368
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~72')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2368parent inode size after: 2400
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~73')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2400parent inode size after: 2432
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~74')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2432parent inode size after: 2464
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~75')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2464parent inode size after: 2496
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~76')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2496parent inode size after: 2528
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~77')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2528parent inode size after: 2560
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~78')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2560parent inode size after: 2592
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~79')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2592parent inode size after: 2624
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~80')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2624parent inode size after: 2656
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~81')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2656parent inode size after: 2688
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~82')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2688parent inode size after: 2720
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~83')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2720parent inode size after: 2752
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~84')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2752parent inode size after: 2784
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~85')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2784parent inode size after: 2816
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~86')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2816parent inode size after: 2848
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~87')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2848parent inode size after: 2880
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~88')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2880parent inode size after: 2912
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~89')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2912parent inode size after: 2944
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~90')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2944parent inode size after: 2976
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~91')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 2976parent inode size after: 3008
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~92')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3008parent inode size after: 3040
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~93')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3040parent inode size after: 3072
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~94')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3072parent inode size after: 3104
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~95')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3104parent inode size after: 3136
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~96')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3136parent inode size after: 3168
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~97')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3168parent inode size after: 3200
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~98')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3200parent inode size after: 3232
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~99')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3232parent inode size after: 3264
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~100')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3264parent inode size after: 3296
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~101')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3296parent inode size after: 3328
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~102')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3328parent inode size after: 3360
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~103')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3360parent inmessage (4096) "4~6~1~80"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~81"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~82"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~83"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~84"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~85"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~86"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~87"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~88"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~89"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~90"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~91"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~92"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~93"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~94"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~95"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~96"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~97"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~98"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~99"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~100"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~101"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~102"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~103"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~104"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~105"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~106"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~107"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~108"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~109"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~110"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~111"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~112"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~113"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~114"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~115"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~116"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~117"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~118"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~119"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~120"
+CLIENT:: read 4096 bytes (message: '0')
+response ode size after: 3392
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~104')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3392parent inode size after: 3424
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~105')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3424parent inode size after: 3456
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~106')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3456parent inode size after: 3488
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~107')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3488parent inode size after: 3520
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~108')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3520parent inode size after: 3552
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~109')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3552parent inode size after: 3584
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~110')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3584parent inode size after: 3616
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~111')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3616parent inode size after: 3648
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~112')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3648parent inode size after: 3680
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~113')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3680parent inode size after: 3712
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~114')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3712parent inode size after: 3744
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~115')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3744parent inode size after: 3776
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~116')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3776parent inode size after: 3808
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~117')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3808parent inode size after: 3840
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~118')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3840parent inode size after: 3872
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~119')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3872parent inode size after: 3904
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~120')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3904parent inode size after: 3936
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~121')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3936parent inode size after: 3968
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~122')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 3968parent inode size after: 4000
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~123')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 4000parent inode size after: 4032
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~124')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 4032parent inode size after: 4064
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '4~6~1~125')
+hello
+inode num = 31, type = 1,  size = 0parent inode size before: 4064parent inode size after: 4096
+ end response from server which is not sent: 0
+SERVER:: read 4096 bytes (message: '0~6~0')
+its in case 0 mkdir
+ look up success : 0 for file =  0 114
+SERVER:: read 4096 bytes (message: '0~6~1')
+its in case 0 mkdir
+ look up success : 0 for file =  1 114
+SERVER:: read 4096 bytes (message: '0~6~2')
+its in case 0 mkdir
+ look up success : 0 for file =  2 114
+SERVER:: read 4096 bytes (message: '0~6~3')
+its in case 0 mkdir
+ look up success : 0 for file =  3 114
+SERVER:: read 4096 bytes (message: '0~6~4')
+its in case 0 mkdir
+ look up success : 0 for file =  4 114
+SERVER:: read 4096 bytes (message: '0~6~5')
+its in case 0 mkdir
+ look up success : 0 for file =  5 114
+SERVER:: read 4096 bytes (message: '0~6~6')
+its in case 0 mkdir
+ look up success : 0 for file =  6 114
+SERVER:: read 4096 bytes (message: '0~6~7')
+its in case 0 mkdir
+ look up success : 0 for file =  7 114
+SERVER:: read 4096 bytes (message: '0~6~8')
+its in case 0 mkdir
+ look up success : 0 for file =  8 114
+SERVER:: read 4096 bytes (message: '0~6~9')
+its in case 0 mkdir
+ look up success : 0 for file =  9 114
+SERVER:: read 4096 bytes (message: '0~6~10')
+its in case 0 mkdir
+ look up success : 0 for file =  10 114
+SERVER:: read 4096 bytes (message: '0~6~11')
+its in case 0 mkdir
+ look up success : 0 for file =  11 114
+SERVER:: read 4096 bytes (message: '0~6~12')
+its in case 0 mkdir
+ look up success : 0 for file =  12 114
+SERVER:: read 4096 bytes (message: '0~6~13')
+its in case 0 mkdir
+ look up success : 0 for file =  13 114
+SERVER:: read 4096 bytes (message: '0~6~14')
+its in case 0 mkdir
+ look up success : 0 for file =  14 114
+SERVER:: read 4096 bytes (message: '0~6~15')
+its in case 0 mkdir
+ look up success : 0 for file =  15 114
+SERVER:: read 4096 bytes (message: '0~6~16')
+its in case 0 mkdir
+ look up success : 0 for file =  16 114
+SERVER:: read 4096 bytes (message: '0~6~17')
+its in case 0 mkdir
+ look up success : 0 for file =  17 114
+SERVER:: read 4096 bytes (message: '0~6~18')
+its in case 0 mkdir
+ look up success : 0 for file =  18 114
+SERVER:: read 4096 bytes (message: '0~6~19')
+its in case 0 mkdir
+ look up success : 0 for file =  19 114
+SERVER:: read 4096 bytes (message: '0~6~20')
+its in case 0 mkdir
+ look up success : 0 for file =  20 114
+SERVER:: read 4096 bytes (message: '0~6~21')
+its in case 0 mkdir
+ look up success : 0 for file =  21 114
+SERVER:: read 4096 bytes (message: '0~6~22')
+its in case 0 mkdir
+ look up success : 0 for file =  22 114
+SERVER:: read 4096 bytes (message: '0~6~23')
+its in case 0 mkdir
+ look up success : 0 for file =  23 114
+SERVER:: read 4096 bytes (message: '0~6~24')
+its in case 0 mkdir
+ look up success : 0 for file =  24 114
+SERVER:: read 4096 bytes (message: '0~6~25')
+its in case 0 mkdir
+ look up success : 0 for file =  25 114
+SERVER:: read 4096 bytes (message: '0~6~26')
+its in case 0 mkdir
+ look up success : 0 for file =  26 114
+SERVER:: read 4096 bytes (message: '0~6~27')
+its in case 0 mkdir
+ look up success : 0 for file =  27 114
+SERVER:: read 4096 bytes (message: '0~6~28')
+its in case 0 mkdir
+ look up success : 0 for file =  28 114
+SERVER:: read 4096 bytes (message: '0~6~29')
+its in case 0 mkdir
+ look up success : 0 for file =  29 114
+SERVER:: read 4096 bytes (message: '0~6~30')
+its in case 0 mkdir
+ look up success : 0 for file =  30 114
+SERVER:: read 4096 bytes (message: '0~6~31')
+its in case 0 mkdir
+ look up success : 0 for file =  31 114
+SERVER:: read 4096 bytes (message: '0~6~32')
+its in case 0 mkdir
+ look up success : 0 for file =  32 114
+SERVER:: read 4096 bytes (message: '0~6~33')
+its in case 0 mkdir
+ look up success : 0 for file =  33 114
+SERVER:: read 4096 bytes (message: '0~6~34')
+its in case 0 mkdir
+ look up success : 0 for file =  34 114
+SERVER:: read 4096 bytes (message: '0~6~35')
+its in case 0 mkdir
+ look up success : 0 for file =  35 114
+SERVER:: read 4096 bytes (message: '0~6~36')
+its in buffer = 0
+CLIENT:: sent message (4096) "4~6~1~121"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~122"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~123"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~124"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "4~6~1~125"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~6~0"
+CLIENT:: read 4096 bytes (message: '7')
+CLIENT:: sent message (4096) "0~6~1"
+CLIENT:: read 4096 bytes (message: '8')
+CLIENT:: sent message (4096) "0~6~2"
+CLIENT:: read 4096 bytes (message: '9')
+CLIENT:: sent message (4096) "0~6~3"
+CLIENT:: read 4096 bytes (message: '10')
+CLIENT:: sent message (4096) "0~6~4"
+CLIENT:: read 4096 bytes (message: '11')
+CLIENT:: sent message (4096) "0~6~5"
+CLIENT:: read 4096 bytes (message: '12')
+CLIENT:: sent message (4096) "0~6~6"
+CLIENT:: read 4096 bytes (message: '13')
+CLIENT:: sent message (4096) "0~6~7"
+CLIENT:: read 4096 bytes (message: '14')
+CLIENT:: sent message (4096) "0~6~8"
+CLIENT:: read 4096 bytes (message: '15')
+CLIENT:: sent message (4096) "0~6~9"
+CLIENT:: read 4096 bytes (message: '16')
+CLIENT:: sent message (4096) "0~6~10"
+CLIENT:: read 4096 bytes (message: '17')
+CLIENT:: sent message (4096) "0~6~11"
+CLIENT:: read 4096 bytes (message: '18')
+CLIENT:: sent message (4096) "0~6~12"
+CLIENT:: read 4096 bytes (message: '19')
+CLIENT:: sent message (4096) "0~6~13"
+CLIENT:: read 4096 bytes (message: '20')
+CLIENT:: sent message (4096) "0~6~14"
+CLIENT:: read 4096 bytes (message: '21')
+CLIENT:: sent message (4096) "0~6~15"
+CLIENT:: read 4096 bytes (message: '22')
+CLIENT:: sent message (4096) "0~6~16"
+CLIENT:: read 4096 bytes (message: '23')
+CLIENT:: sent message (4096) "0~6~17"
+CLIENT:: read 4096 bytes (message: '24')
+CLIENT:: sent message (4096) "0~6~18"
+CLIENT:: read 4096 bytes (message: '25')
+CLIENT:: sent message (4096) "0~6~19"
+CLIENT:: read 4096 bytes (message: '26')
+CLIENT:: sent message (4096) "0~6~20"
+CLIENT:: read 4096 bytes (message: '27')
+CLIENT:: sent message (4096) "0~6~21"
+CLIENT:: read 4096 bytes (message: '28')
+CLIENT:: sent message (4096) "0~6~22"
+CLIENT:: read 4096 bytes (message: '29')
+CLIENT:: sent message (4096) "0~6~23"
+CLIENT:: read 4096 bytes (message: '30')
+CLIENT:: sent message (4096) "0~6~24"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~25"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~26"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~27"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~28"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~29"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~30"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~31"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~32"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~33"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~34"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~35"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~36"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~37"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~38"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~39"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~40"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~41"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~42"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~43"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~44"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~45"
+case 0 mkdir
+ look up success : 0 for file =  36 114
+SERVER:: read 4096 bytes (message: '0~6~37')
+its in case 0 mkdir
+ look up success : 0 for file =  37 114
+SERVER:: read 4096 bytes (message: '0~6~38')
+its in case 0 mkdir
+ look up success : 0 for file =  38 114
+SERVER:: read 4096 bytes (message: '0~6~39')
+its in case 0 mkdir
+ look up success : 0 for file =  39 114
+SERVER:: read 4096 bytes (message: '0~6~40')
+its in case 0 mkdir
+ look up success : 0 for file =  40 114
+SERVER:: read 4096 bytes (message: '0~6~41')
+its in case 0 mkdir
+ look up success : 0 for file =  41 114
+SERVER:: read 4096 bytes (message: '0~6~42')
+its in case 0 mkdir
+ look up success : 0 for file =  42 114
+SERVER:: read 4096 bytes (message: '0~6~43')
+its in case 0 mkdir
+ look up success : 0 for file =  43 114
+SERVER:: read 4096 bytes (message: '0~6~44')
+its in case 0 mkdir
+ look up success : 0 for file =  44 114
+SERVER:: read 4096 bytes (message: '0~6~45')
+its in case 0 mkdir
+ look up success : 0 for file =  45 114
+SERVER:: read 4096 bytes (message: '0~6~46')
+its in case 0 mkdir
+ look up success : 0 for file =  46 114
+SERVER:: read 4096 bytes (message: '0~6~47')
+its in case 0 mkdir
+ look up success : 0 for file =  47 114
+SERVER:: read 4096 bytes (message: '0~6~48')
+its in case 0 mkdir
+ look up success : 0 for file =  48 114
+SERVER:: read 4096 bytes (message: '0~6~49')
+its in case 0 mkdir
+ look up success : 0 for file =  49 114
+SERVER:: read 4096 bytes (message: '0~6~50')
+its in case 0 mkdir
+ look up success : 0 for file =  50 114
+SERVER:: read 4096 bytes (message: '0~6~51')
+its in case 0 mkdir
+ look up success : 0 for file =  51 114
+SERVER:: read 4096 bytes (message: '0~6~52')
+its in case 0 mkdir
+ look up success : 0 for file =  52 114
+SERVER:: read 4096 bytes (message: '0~6~53')
+its in case 0 mkdir
+ look up success : 0 for file =  53 114
+SERVER:: read 4096 bytes (message: '0~6~54')
+its in case 0 mkdir
+ look up success : 0 for file =  54 114
+SERVER:: read 4096 bytes (message: '0~6~55')
+its in case 0 mkdir
+ look up success : 0 for file =  55 114
+SERVER:: read 4096 bytes (message: '0~6~56')
+its in case 0 mkdir
+ look up success : 0 for file =  56 114
+SERVER:: read 4096 bytes (message: '0~6~57')
+its in case 0 mkdir
+ look up success : 0 for file =  57 114
+SERVER:: read 4096 bytes (message: '0~6~58')
+its in case 0 mkdir
+ look up success : 0 for file =  58 114
+SERVER:: read 4096 bytes (message: '0~6~59')
+its in case 0 mkdir
+ look up success : 0 for file =  59 114
+SERVER:: read 4096 bytes (message: '0~6~60')
+its in case 0 mkdir
+ look up success : 0 for file =  60 114
+SERVER:: read 4096 bytes (message: '0~6~61')
+its in case 0 mkdir
+ look up success : 0 for file =  61 114
+SERVER:: read 4096 bytes (message: '0~6~62')
+its in case 0 mkdir
+ look up success : 0 for file =  62 114
+SERVER:: read 4096 bytes (message: '0~6~63')
+its in case 0 mkdir
+ look up success : 0 for file =  63 114
+SERVER:: read 4096 bytes (message: '0~6~64')
+its in case 0 mkdir
+ look up success : 0 for file =  64 114
+SERVER:: read 4096 bytes (message: '0~6~65')
+its in case 0 mkdir
+ look up success : 0 for file =  65 114
+SERVER:: read 4096 bytes (message: '0~6~66')
+its in case 0 mkdir
+ look up success : 0 for file =  66 114
+SERVER:: read 4096 bytes (message: '0~6~67')
+its in case 0 mkdir
+ look up success : 0 for file =  67 114
+SERVER:: read 4096 bytes (message: '0~6~68')
+its in case 0 mkdir
+ look up success : 0 for file =  68 114
+SERVER:: read 4096 bytes (message: '0~6~69')
+its in case 0 mkdir
+ look up success : 0 for file =  69 114
+SERVER:: read 4096 bytes (message: '0~6~70')
+its in case 0 mkdir
+ look up success : 0 for file =  70 114
+SERVER:: read 4096 bytes (message: '0~6~71')
+its in case 0 mkdir
+ look up success : 0 for file =  71 114
+SERVER:: read 4096 bytes (message: '0~6~72')
+its in case 0 mkdir
+ look up success : 0 for file =  72 114
+SERVER:: read 4096 bytes (message: '0~6~73')
+its in case 0 mkdir
+ look up success : 0 for file =  73 114
+SERVER:: read 4096 bytes (message: '0~6~74')
+its in case 0 mkdir
+ look up success : 0 for file =  74 114
+SERVER:: read 4096 bytes (message: '0~6~75')
+its in cCLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~46"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~47"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~48"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~49"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~50"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~51"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~52"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~53"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~54"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~55"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~56"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~57"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~58"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~59"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~60"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~61"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~62"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~63"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~64"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~65"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~66"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~67"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~68"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~69"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~70"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~71"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~72"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~73"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~74"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~75"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~76"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~77"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~78"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~79"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~80"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~81"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~82"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~83"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~84"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~85"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~86"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~87"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~88"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~89"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~90"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~91"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~92"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~93"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~94"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~95"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~96"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (409ase 0 mkdir
+ look up success : 0 for file =  75 114
+SERVER:: read 4096 bytes (message: '0~6~76')
+its in case 0 mkdir
+ look up success : 0 for file =  76 114
+SERVER:: read 4096 bytes (message: '0~6~77')
+its in case 0 mkdir
+ look up success : 0 for file =  77 114
+SERVER:: read 4096 bytes (message: '0~6~78')
+its in case 0 mkdir
+ look up success : 0 for file =  78 114
+SERVER:: read 4096 bytes (message: '0~6~79')
+its in case 0 mkdir
+ look up success : 0 for file =  79 114
+SERVER:: read 4096 bytes (message: '0~6~80')
+its in case 0 mkdir
+ look up success : 0 for file =  80 114
+SERVER:: read 4096 bytes (message: '0~6~81')
+its in case 0 mkdir
+ look up success : 0 for file =  81 114
+SERVER:: read 4096 bytes (message: '0~6~82')
+its in case 0 mkdir
+ look up success : 0 for file =  82 114
+SERVER:: read 4096 bytes (message: '0~6~83')
+its in case 0 mkdir
+ look up success : 0 for file =  83 114
+SERVER:: read 4096 bytes (message: '0~6~84')
+its in case 0 mkdir
+ look up success : 0 for file =  84 114
+SERVER:: read 4096 bytes (message: '0~6~85')
+its in case 0 mkdir
+ look up success : 0 for file =  85 114
+SERVER:: read 4096 bytes (message: '0~6~86')
+its in case 0 mkdir
+ look up success : 0 for file =  86 114
+SERVER:: read 4096 bytes (message: '0~6~87')
+its in case 0 mkdir
+ look up success : 0 for file =  87 114
+SERVER:: read 4096 bytes (message: '0~6~88')
+its in case 0 mkdir
+ look up success : 0 for file =  88 114
+SERVER:: read 4096 bytes (message: '0~6~89')
+its in case 0 mkdir
+ look up success : 0 for file =  89 114
+SERVER:: read 4096 bytes (message: '0~6~90')
+its in case 0 mkdir
+ look up success : 0 for file =  90 114
+SERVER:: read 4096 bytes (message: '0~6~91')
+its in case 0 mkdir
+ look up success : 0 for file =  91 114
+SERVER:: read 4096 bytes (message: '0~6~92')
+its in case 0 mkdir
+ look up success : 0 for file =  92 114
+SERVER:: read 4096 bytes (message: '0~6~93')
+its in case 0 mkdir
+ look up success : 0 for file =  93 114
+SERVER:: read 4096 bytes (message: '0~6~94')
+its in case 0 mkdir
+ look up success : 0 for file =  94 114
+SERVER:: read 4096 bytes (message: '0~6~95')
+its in case 0 mkdir
+ look up success : 0 for file =  95 114
+SERVER:: read 4096 bytes (message: '0~6~96')
+its in case 0 mkdir
+ look up success : 0 for file =  96 114
+SERVER:: read 4096 bytes (message: '0~6~97')
+its in case 0 mkdir
+ look up success : 0 for file =  97 114
+SERVER:: read 4096 bytes (message: '0~6~98')
+its in case 0 mkdir
+ look up success : 0 for file =  98 114
+SERVER:: read 4096 bytes (message: '0~6~99')
+its in case 0 mkdir
+ look up success : 0 for file =  99 114
+SERVER:: read 4096 bytes (message: '0~6~100')
+its in case 0 mkdir
+ look up success : 0 for file =  100 114
+SERVER:: read 4096 bytes (message: '0~6~101')
+its in case 0 mkdir
+ look up success : 0 for file =  101 114
+SERVER:: read 4096 bytes (message: '0~6~102')
+its in case 0 mkdir
+ look up success : 0 for file =  102 114
+SERVER:: read 4096 bytes (message: '0~6~103')
+its in case 0 mkdir
+ look up success : 0 for file =  103 114
+SERVER:: read 4096 bytes (message: '0~6~104')
+its in case 0 mkdir
+ look up success : 0 for file =  104 114
+SERVER:: read 4096 bytes (message: '0~6~105')
+its in case 0 mkdir
+ look up success : 0 for file =  105 114
+SERVER:: read 4096 bytes (message: '0~6~106')
+its in case 0 mkdir
+ look up success : 0 for file =  106 114
+SERVER:: read 4096 bytes (message: '0~6~107')
+its in case 0 mkdir
+ look up success : 0 for file =  107 114
+SERVER:: read 4096 bytes (message: '0~6~108')
+its in case 0 mkdir
+ look up success : 0 for file =  108 114
+SERVER:: read 4096 bytes (message: '0~6~109')
+its in case 0 mkdir
+ look up success : 0 for file =  109 114
+SERVER:: read 4096 bytes (message: '0~6~110')
+its in case 0 mkdir
+ look up success : 0 for file =  110 114
+SERVER:: read 4096 bytes (message: '0~6~111')
+its in case 0 mkdir
+ look up success : 0 for file =  111 114
+SERVER:: read 4096 bytes (message: '0~6~112')
+its in case 0 mkdir
+ look up success : 0 for file =  112 114
+SERVER:: read 4096 bytes (message: '0~6~113')
+its in case 0 mkdir
+ look up success : 0 for file =  113 114
+SERVER:: read 4096 bytes (message: '0~6~114')
+its in case 0 mkdir
+ look up success : 0 for file =  114 114
+SERVER:: read 4096 bytes (message: '0~6~115')
+its in case 0 mkdir
+ look up success : 0 for file =  115 114
+SERVER:: read 4096 bytes (message: '0~6~116')
+its in case 0 mkdir
+ look up success : 0 for file =  116 114
+SERVER:: read 4096 bytes (message: '0~6~117')
+its in case 0 mkdir
+ look up success : 0 for file =  117 114
+SERVER:: read 4096 bytes (message: '0~6~118')
+its in case 0 mkdir
+ look up success : 0 for file =  118 114
+SERVER:: read 4096 bytes (message: '0~6~119')
+its in case 0 mkdir
+ look up success : 0 for file =  119 114
+SERVER:: read 4096 bytes (message: '0~6~120')
+its in case 0 mkdir
+ look up success : 0 for file =  120 114
+SERVER:: read 4096 bytes (message: '0~6~121')
+its in case 0 mkdir
+ look up success : 0 for file =  121 114
+SERVER:: read 4096 bytes (message: '0~6~122')
+its in case 0 mkdir
+ look up success : 0 for file =  122 114
+SERVER:: read 4096 bytes (message: '0~6~123')
+its in case 0 mkdir
+ look up success : 0 for file =  123 114
+SERVER:: read 4096 bytes (message: '0~6~124')
+its in case 0 mkdir
+ look up success : 0 for file =  124 114
+SERVER:: read 4096 bytes (message: '0~6~125')
+its in case 0 mkdir
+ look up success : 0 for file =  125 114
+SERVER:: read 4096 bytes (message: '6')
+shutdown done!
+6) "0~6~97"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~98"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~99"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~100"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~101"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~102"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~103"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~104"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~105"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~106"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~107"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~108"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~109"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~110"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~111"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~112"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~113"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~114"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~115"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~116"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~117"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~118"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~119"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~120"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~121"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~122"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~123"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~124"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "0~6~125"
+CLIENT:: read 4096 bytes (message: '31')
+CLIENT:: sent message (4096) "6"
+
+
+test bigdir PASSED
+ (create a directory with 126 files)
+
+('starting', 'deep')
+
+**********************************************************************
+
+Test deep
+create many deeply nested directories
+
+**********************************************************************
+total blocks        39
+  inodes            128 [size of each: 128]
+  data blocks       32
+layout details
+  inode bitmap address/len 1 [1]
+  data bitmap address/len  2 [1]
+Starting server on port 6918
+/tmp/tmpGCgqBB/p/server 6918 /home/keerthi/os-fall22/p4/remzi/test.img
+CLIENT:: sent message (4096) "4~0~0~testdir"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~0~testdir"
+CLIENT:: read 4096 bytes (message: '6')
+CLIENT:: sent message (4096) "4~6~0~0"
+CLIENT:: read 4096 bytes (message: '0')
+response buffer = 0
+CLIENT:: sent message (4096) "0~6~0"
+CLIENT:: read 4096 bytes (message: '7')
+CLIENT:: sent message (4096) "4~7~0~1"
+CLIENT:: read 4096 bytes (message: '-1')
+response buffer = -1
+Failure: MFS_Creat returned failure inum=7 type=0 name='1'
+
+
+test deep FAILED
+ (create many deeply nested directories)
+ MFS_Creat returned failure inum=7 type=0 name='1'
+
+**********************************************************************
+Summary:
+test build PASSED
+ (build project using make)
+
+test shutdown PASSED
+ (init server and client then call shutdown)
+
+test creat PASSED
+ (creat a file and check with lookup)
+
+test write FAILED
+ (write then read one block)
+ Corrupt data returned by read
+
+test stat FAILED
+ (stat a regular file)
+ Stat gave wrong size
+
+test overwrite FAILED
+ (overwrite a block)
+ Corrupt data returned by read
+
+test maxfile FAILED
+ (write largest possible file)
+ Corrupt data returned by read
+
+test maxfile2 FAILED
+ (write more blocks than possible)
+ MFS_Write should fail on inalid block number
+
+test dir1 PASSED
+ (check root for dot entries)
+
+test dir2 PASSED
+ (create a new directory and check it)
+
+test baddir FAILED
+ (try to create a file with a file parent inode)
+ MFS_Creat should fail if pinum is not a directory
+
+test baddir2 FAILED
+ (try to lookup a file with a file parent inode)
+ MFS_Lookup should fail if pinum is not a directory
+
+test unlink PASSED
+ (unlink a file)
+
+test unlink2 PASSED
+ (unlink a directory)
+
+test empty PASSED
+ (unlink a non-empty directory)
+
+test name PASSED
+ (name too long)
+
+test persist FAILED
+ (restart server after creating a file)
+ Corrupt data returned by read
+
+test bigdir PASSED
+ (create a directory with 126 files)
+
+test deep FAILED
+ (create many deeply nested directories)
+ MFS_Creat returned failure inum=7 type=0 name='1'
+
+Passed 10 of 19 tests.
+Overall 10 of 19

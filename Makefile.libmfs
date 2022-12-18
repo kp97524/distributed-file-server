@@ -1,5 +1,6 @@
-libmfs.so.1: libmfs.o
-	gcc -shared -Wl,-soname,libmfs.so -o libmfs.so libmfs.o -lc
+
+libmfs.so: libmfs.o udp.o
+	gcc -shared -Wl,-soname,libmfs.so -o libmfs.so libmfs.o udp.c -lc 
 
 libmfs.o: libmfs.c
-	gcc -fPIC -g -c -Wall libmfs.c
+	gcc -fPIC -g -c -Wall libmfs.c udp.c

@@ -17,7 +17,7 @@ typedef struct {
 typedef struct {
     char name[28];  // up to 28 bytes of name in directory (including \0)
     int  inum;      // inode number of entry (-1 means entry not used)
-} dir_ent_t;
+}  dir_ent_t;
 
 // presumed: block 0 is the super block
 typedef struct __super {
