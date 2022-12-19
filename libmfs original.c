@@ -1,11 +1,10 @@
-// structure libmfs
+
 #include<stdio.h>
 #include "mfs.h"
 #include "udp.h"
 #include <time.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "MFS_Msg.h"
 
 #define BUFFER_SIZE (4096)
 /*
@@ -43,18 +42,10 @@ int MFS_Lookup(int pinum, char *name){
     if (sd < 0) {
 		return sd;
 	} 
-
-	MFS_Msg_t m;
-	m.inum = pinum;
-	m.type = MFS_LOOKUP;
-	memcpy(m.buffer, name, 4096);
-
-	int rc = UDP_Write(sd, &saddr, (char *)&m, sizeof(MFS_Msg_t));
-
-	// char message[BUFFER_SIZE];
-    // sprintf(message, "0~%d~%s", pinum, name);
-    // int rc = UDP_Write(sd, &saddr, message, BUFFER_SIZE);
-    printf("CLIENT:: sent message (%d) MFS_Lookup pinum = %d name = %s\n", rc, m.inum, m.buffer);
+	char message[BUFFER_SIZE];
+    sprintf(message, "0~%d~%s", pinum, name);
+    int rc = UDP_Write(sd, &saddr, message, BUFFER_SIZE);
+    printf("CLIENT:: sent message (%d) \"%s\"\n", rc, message);
 	if (rc < 0) {
 	    sd = UDP_Open(-1);
 		//return rc;
@@ -63,7 +54,7 @@ int MFS_Lookup(int pinum, char *name){
    	fd_set fds;
 	struct timeval timeout;
 	/* Set time limit. */
-	timeout.tv_sec = 5;
+	timeout.tv_sec = 300;
 	timeout.tv_usec = 0;
 	/* Create a descriptor set containing our two sockets.  */
 	FD_ZERO(&fds);
@@ -81,25 +72,22 @@ int MFS_Lookup(int pinum, char *name){
 	/* Data is available */
 	else {
 		struct sockaddr_in raddr;
-		MFS_Msg_t reply;
-		int rc = UDP_Read(sd, &raddr, (char *)&reply, sizeof(MFS_Msg_t));
-		printf("CLIENT:: read %d bytes (message: '%d')\n", rc, reply.retCode);
-		return reply.retCode;
+		char buffer[BUFFER_SIZE];
+		int rc = UDP_Read(sd, &raddr, buffer, BUFFER_SIZE);
+		printf("CLIENT:: read %d bytes (message: '%s')\n", rc, buffer);
+		return atoi(buffer);
 	}
 
 	return 0;
 }
-int MFS_Stat(int inum, MFS_Stat_t *mstat){
+int MFS_Stat(int inum, MFS_Stat_t *m){
 	if (sd < 0) {
 		return sd;
 	} 
-	MFS_Msg_t m;
-	m.inum = inum;
-	m.type = MFS_STAT;
-
-	int rc = UDP_Write(sd, &saddr, (char *)&m, sizeof(MFS_Msg_t));
-
-    printf("CLIENT:: sent message (%d) MFS_Stat inum = %d\n", rc, m.inum);
+	char message[BUFFER_SIZE];
+    sprintf(message, "1~%d", inum);
+    int rc = UDP_Write(sd, &saddr, message, BUFFER_SIZE);
+    printf("CLIENT:: sent message (%d) \"%s\"\n", rc, message);
 	if (rc < 0) {
 		sd = UDP_Open(-1);		
 		//return rc;
@@ -121,22 +109,21 @@ int MFS_Stat(int inum, MFS_Stat_t *mstat){
 	}
 	/* No data in five seconds */	
 	else if (rc == 0) {
-		return MFS_Stat(inum, mstat);
+		return MFS_Stat(inum, m);
 	}
 	/* Data is available */
 	else {
-		MFS_Msg_t reply;
-		//mstat = malloc(4096);
-		int rc = UDP_Read(sd, &raddr, (char *)&reply, sizeof(MFS_Msg_t));
-		printf("CLIENT:: read %d bytes (message: '%d')\n", rc, reply.retCode);
-		MFS_Stat_t *mstat1;
-		mstat1 = (MFS_Stat_t *)reply.buffer;
+		char buffer[BUFFER_SIZE];
+		struct sockaddr_in raddr;
+		int rc = UDP_Read(sd, &raddr, buffer, BUFFER_SIZE);
+		printf("CLIENT:: read %d bytes (message: '%s')\n", rc, buffer);
+		printf("CLIENT:: STAT SUCCESSFUL\n");
+		int retCode = atoi(strtok(buffer, "~"));
+		m->type = atoi(strtok(NULL, "~"));
+		m->size = atoi(strtok(NULL, "~"));
 
-		mstat->size = mstat1->size;
-		mstat->type= mstat1->type;
-		printf("type= %d  size =%d\n", mstat->type, mstat-> size);
-
-		return reply.retCode;
+		printf("type= %d  size =%d\n", m->type, m-> size);
+		return retCode;
 	}
 
 	return 0;
@@ -148,25 +135,32 @@ int MFS_Write(int inum, char *buffer, int offset, int nbytes){
     if (sd < 0) {
 		return sd;
 	} 
-	MFS_Msg_t m;
-	m.inum = inum;
-	m.type = MFS_WRITE;
-	m.offset = offset;
-	m.nbytes = nbytes;
-	memcpy(m.buffer, buffer, nbytes);
-   // print to vheck data
- 
-	int rc = UDP_Write(sd, &saddr, (char *)&m, sizeof(MFS_Msg_t));
-
-    printf("CLIENT:: sent message (%d) MFS_WRITE offset = %d, nbytes= %d\n", rc,  m.offset, m.nbytes);
+	char message[2*BUFFER_SIZE];
+    sprintf(message, "2~%d~%s~%d~%d", inum, buffer, offset,nbytes);
+	printf("size of buf %ld\n",strlen(buffer));
+    int rc = UDP_Write(sd, &saddr, message, 2*BUFFER_SIZE);
+    printf("CLIENT:: sent message (%d) \"%s\"\n", rc, message);
 	if (rc < 0) {
 		sd = UDP_Open(-1);		
 		//return rc;
 	} 
+
+	//to send buffer from client to server
+  //  rc = UDP_Write(sd, &saddr, buffer, BUFFER_SIZE);
+   // printf("CLIENT:: sent message (%d) buffer = %s\n", rc, buffer);
+	/*int i;	
+	for (i = 0; i < BUFFER_SIZE; i++ ) {
+  		putc( isprint(buffer[i]) ? buffer[i] : '.' , stdout );
+	}
+	printf("\n");
+	if (rc < 0) {
+		return rc;
+	} */
+
    	fd_set fds;
 	struct timeval timeout;
 	/* Set time limit. */
-	timeout.tv_sec = 100;
+	timeout.tv_sec = 300;
 	timeout.tv_usec = 0;
 	/* Create a descriptor set containing our two sockets.  */
 	FD_ZERO(&fds);
@@ -179,16 +173,16 @@ int MFS_Write(int inum, char *buffer, int offset, int nbytes){
 	}
 	/* No data in five seconds */	
 	else if (rc == 0) {
-		//return MFS_Write(inum, buffer, offset, nbytes);
+		return MFS_Write(inum, buffer, offset, nbytes);
 	}
 	/* Data is available */
 	else {
 		struct sockaddr_in raddr;
-		MFS_Msg_t reply;
-		int rc = UDP_Read(sd, &raddr, (char *)&reply, sizeof(MFS_Msg_t));
-		printf("CLIENT:: read %d bytes (message: '%d')\n", rc, reply.retCode);
-
-		return reply.retCode;
+		int rc = UDP_Read(sd, &raddr, message, BUFFER_SIZE);
+		printf("CLIENT:: read %d bytes (message: '%s')\n", rc, message);
+        int retCode = atoi(strtok(message, "~"));
+		buffer = strtok(NULL, "~");
+		return retCode;
 	}
 
 	return 0;
@@ -197,17 +191,10 @@ int MFS_Read(int inum, char *buffer, int offset, int nbytes){
    if (sd < 0) {
 		return sd;
 	} 
-	MFS_Msg_t m;
-	m.inum = inum;
-	m.type = MFS_READ;
-	m.offset = offset;
-	m.nbytes = nbytes;
-	//memcpy(m.buffer, buffer, 4096);
-
-	int rc = UDP_Write(sd, &saddr, (char *)&m, sizeof(MFS_Msg_t));
-
-    printf("CLIENT:: sent message (%d) MFS_Read offset = %d, nbytes = %d\n", rc, m.offset, m.nbytes);
-
+	char message[BUFFER_SIZE];
+    sprintf(message, "3~%d~%d~%d", inum,offset,nbytes);
+    int rc = UDP_Write(sd, &saddr, message, BUFFER_SIZE);
+    printf("CLIENT:: sent message (%d) \"%s\"\n", rc, message);
 	if (rc < 0) {
 		sd = UDP_Open(-1);		
 		//return rc;
@@ -216,7 +203,7 @@ int MFS_Read(int inum, char *buffer, int offset, int nbytes){
    	fd_set fds;
 	struct timeval timeout;
 	/* Set time limit. */
-	timeout.tv_sec = 5;
+	timeout.tv_sec = 300;
 	timeout.tv_usec = 0;
 	/* Create a descriptor set containing our two sockets.  */
 	FD_ZERO(&fds);
@@ -233,14 +220,30 @@ int MFS_Read(int inum, char *buffer, int offset, int nbytes){
 	}
 	/* Data is available */
 	else {
-	struct sockaddr_in raddr;
-		MFS_Msg_t reply;
-		int rc = UDP_Read(sd, &raddr, (char *)&reply, sizeof(MFS_Msg_t));
-		printf("CLIENT:: read %d bytes (message: '%d')\n", rc, reply.retCode);
-		
-		memcpy(buffer, reply.buffer, 4096);
-		
-		return reply.retCode;
+		struct sockaddr_in raddr;
+		int rc = UDP_Read(sd, &raddr, message, BUFFER_SIZE);
+		printf("CLIENT:: read %d bytes (message: '%s')\n", rc, message);
+		//int retCode = atoi(message);
+
+		int retCode = atoi(strtok(message, "~"));
+		buffer = strtok(NULL, "~");
+		//memcpy(buffer, message, BUFFER_SIZE);
+		//rc = UDP_Read(sd, &raddr, buffer, BUFFER_SIZE);
+		//printf("CLIENT:: read %d bytes (message: 'BUFFER')\n", rc);
+		printf("buffer in mfs read = %s\n", buffer);
+		/*int i;		
+		for (i = 0; i < BUFFER_SIZE; i++ ) {
+	  		putc( isprint(buffer[i]) ? buffer[i] : '.' , stdout );
+		}
+		printf("\n");
+		printf("CLIENT:: test 'BUFFER'\n\"");
+		for (i = 0; i < BUFFER_SIZE; i++ ) {
+			if(buffer[i] != test[i]) {
+	  			putc( isprint(buffer[i]) ? buffer[i] : '.' , stdout );
+			}
+		}
+		printf("\"\n");*/
+		return retCode;
 	}
 
 	return 0;
@@ -252,16 +255,10 @@ int MFS_Creat(int pinum, int type, char *name) {
 	if (sd < 0) {
 		return sd;
 	} 
-	MFS_Msg_t m;
-	m.inum = pinum;
-	m.type = MFS_CREAT;
-	m.fileType = type;
-	memcpy(m.buffer, name, 4096);
-
-	int rc = UDP_Write(sd, &saddr, (char *)&m, sizeof(MFS_Msg_t));
-
-    printf("CLIENT:: sent message (%d) MFS_Creat, inum = %d, type = %d, name = %s\n", rc, m.inum, m.fileType, m.buffer);
-
+	char message[BUFFER_SIZE];
+    sprintf(message, "4~%d~%d~%s", pinum, type, name);
+    int rc = UDP_Write(sd, &saddr, message, BUFFER_SIZE);
+    printf("CLIENT:: sent message (%d) \"%s\"\n", rc, message);
 	if (rc < 0) {
 		sd = UDP_Open(-1);		
 		return rc;
@@ -270,7 +267,7 @@ int MFS_Creat(int pinum, int type, char *name) {
    	fd_set fds;
 	struct timeval timeout;
 	/* Set time limit. */
-	timeout.tv_sec =  5;
+	timeout.tv_sec =  300;
 	timeout.tv_usec = 0;
 	/* Create a descriptor set containing our two sockets.  */
 	FD_ZERO(&fds);
@@ -284,12 +281,12 @@ int MFS_Creat(int pinum, int type, char *name) {
 	}
 	// Data is available 
 	else if (rc) {
+		char buffer[BUFFER_SIZE];
 		struct sockaddr_in raddr;
-		MFS_Msg_t reply;
-		int rc = UDP_Read(sd, &raddr, (char *)&reply, sizeof(MFS_Msg_t));
-		printf("CLIENT:: read %d bytes (message: '%d')\n", rc, reply.retCode);
-
-		return reply.retCode;
+		int rc = UDP_Read(sd, &raddr, buffer, BUFFER_SIZE);
+		printf("CLIENT:: read %d bytes (message: '%s')\n", rc, buffer);
+		printf("response buffer = %d\n", atoi(buffer));
+		return atoi(buffer);
 	}
 	//No data in five seconds 
 	else {
@@ -305,14 +302,10 @@ int MFS_Unlink(int pinum, char *name){
   if (sd < 0) {
 		return sd;
 	} 
-	MFS_Msg_t m;
-	m.inum = pinum;
-	m.type = MFS_UNLINK;
-	memcpy(m.buffer, name, 4096);
-
-	int rc = UDP_Write(sd, &saddr, (char *)&m, sizeof(MFS_Msg_t));
-
-    printf("CLIENT:: sent message (%d) MFS_UNLINK pinum = %d  name =%s\n", rc, m.inum, m.buffer);
+	char message[BUFFER_SIZE];
+    sprintf(message, "5~%d~%s", pinum, name);
+    int rc = UDP_Write(sd, &saddr, message, BUFFER_SIZE);
+    printf("CLIENT:: sent message (%d) \"%s\"\n", rc, message);
 	if (rc < 0) {
 		sd = UDP_Open(-1);		
 		//return rc;
@@ -338,11 +331,11 @@ int MFS_Unlink(int pinum, char *name){
 	}
 	/* Data is available */
 	else {
+		char buffer[BUFFER_SIZE];
 		struct sockaddr_in raddr;
-		MFS_Msg_t reply;
-		int rc = UDP_Read(sd, &raddr, (char *)&reply, sizeof(MFS_Msg_t));
-		printf("CLIENT:: read %d bytes (message: '%d')\n", rc, reply.retCode);
-		return reply.retCode;
+		int rc = UDP_Read(sd, &raddr, buffer, BUFFER_SIZE);
+		printf("CLIENT:: read %d bytes (message: '%s')\n", rc, buffer);
+		return atoi(buffer);
 	}
 
 	return 0;
@@ -351,12 +344,10 @@ int MFS_Shutdown(){
   if (sd < 0) {
 		return sd;
 	} 
-	MFS_Msg_t m;
-	m.type = MFS_SHUTDOWN;
-
-	int rc = UDP_Write(sd, &saddr, (char *)&m, sizeof(MFS_Msg_t));
-
-    printf("CLIENT:: sent message SHUTDOWN (%d)\n", rc );
+	char message[BUFFER_SIZE];
+    sprintf(message, "6");
+    int rc = UDP_Write(sd, &saddr, message, BUFFER_SIZE);
+    printf("CLIENT:: sent message (%d) \"%s\"\n", rc, message);
 	if (rc < 0) {
 		return rc;
 	} 

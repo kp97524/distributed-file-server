@@ -14,4 +14,5 @@ typedef struct __MFS_Msg_t {
   char buffer[4096];
   int nbytes;
   int fileType;
+  int retCode;
 }MFS_Msg_t;

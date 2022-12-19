@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include "udp.h"
-#include "message.h"
 #include<sys/stat.h>
 #include <sys/mman.h>
 #include<string.h>
@@ -9,11 +8,13 @@
 #include "mfs.h"
 #include <time.h>
 #include <stdlib.h>
+#include "MFS_Msg.h"
 
 
 int MIN_PORT = 20000;
 int MAX_PORT = 40000;
 
+MFS_Msg_t reply;
 
 int fd, sd, rc, imageFD, currentINodeNum;
 struct sockaddr_in s;
@@ -102,12 +103,18 @@ void intHandler(int dummy) {
 }
 
 int MFS_Lookup(int pinum, char *name){
-  char reply[UFS_BLOCK_SIZE];
+
+  reply.type = MFS_LOOKUP;
+  //char reply[UFS_BLOCK_SIZE];
 
    if(get_bit(inode_bitmap->bits,pinum) == 0 || itable->inodes[pinum].type == UFS_REGULAR_FILE){
       printf("\n in look up pinode doesnt exists \n");
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    // sprintf(reply, "%d", -1);
+    // rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+
+    reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
+
     return -1;
   }
   int parent_dir = (itable->inodes[pinum].direct[0]);
@@ -118,69 +125,81 @@ int MFS_Lookup(int pinum, char *name){
    
    for(int i=0;i<128;i++){
     if(!strcmp(parent->entries[i].name, name)){
-
-    printf("\n look up success : 0 for file =  %s 114\n", name);
-    sprintf(reply, "%d", parent->entries[i].inum);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
-        return parent->entries[i].inum;
+      printf("\n look up success : 0 for file =  %s 114\n", name);
+      reply.retCode = parent->entries[i].inum;
+       rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
+       return reply.retCode;
     }
    }
 
      printf("\n couldnt find child dir: -1   158\n");
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    // sprintf(reply, "%d", -1);
+    reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
+    
   return -1;
 }
 
 int MFS_Stat(int inum, MFS_Stat_t *m){
 
-   char reply[UFS_BLOCK_SIZE];
+MFS_Stat_t *m1 = (MFS_Stat_t *)reply.buffer;
+
+   reply.type = MFS_STAT;
+   //char reply[UFS_BLOCK_SIZE];
   if(get_bit(inode_bitmap->bits,inum) == 0){
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+   
+    reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return -1;
   }
    int type = itable->inodes[inum].type;
    int size = itable->inodes[inum].size;
-   MFS_Stat_t *local_m = malloc(sizeof(MFS_Stat_t));
-   local_m->size = size;
-   local_m->type = type;
+  // MFS_Stat_t *local_m = malloc(sizeof(MFS_Stat_t));
+
+   m1->size = size;
+   m1->type = type;
+
+
+
    //memcpy(m, local_m, sizeof(local_m));
 
     printf("MFS_STAT : type = %d size = %d\n", type, size);
-   sprintf(reply, "%d~%d~%d", 0, local_m->type, local_m->size);
-   rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+  //  sprintf(reply, "%d~%d~%d", 0, local_m->type, local_m->size);
+  //  rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+//  memcpy(reply.buffer, (char *) &m1 ,sizeof(MFS_Stat_t));
+
+  reply.retCode = 0;
+  fprintf(stderr, "stat response in server = %d, type = %d, size = %d\n", reply.retCode, m1->type, m1->size);
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
    return 0;
 }
 
 int MFS_Creat(int pinum, int type, char *name){
- printf("hello\n");
+ 
   int new_inode_num, new_data_num;
-  char reply[UFS_BLOCK_SIZE];
+  //char reply[UFS_BLOCK_SIZE];
+  reply.type = MFS_CREAT;
 
   if( get_bit(inode_bitmap->bits,pinum) != 1){
-    fsync(fd);
-    printf("response from server which is not sent: -1   137\n");
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = -1;
+    rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return -1;
   }
   if(strlen(name) > 28){
-     printf("response from server which is not sent: -1   137\n");
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = -1;
+    rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return -1;
   }
   if(itable->inodes[pinum].type == UFS_REGULAR_FILE){
     printf("file within file cant be done!\n");
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = -1;
+    rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return -1;
   }
 
   int parent_dir = (itable->inodes[pinum].direct[0]);// will get parent's directory data blocks
 
-  dir_block_t * parent_di = (void *) (image + ( parent_dir)* UFS_BLOCK_SIZE);
+  dir_block_t * parent_di = (void *) (image + (parent_dir)* UFS_BLOCK_SIZE);
   dir_block_t *parent = malloc(sizeof(dir_block_t));
   memcpy(parent, parent_di, sizeof(dir_block_t));
 
@@ -194,9 +213,8 @@ int MFS_Creat(int pinum, int type, char *name){
   }
   if(fl){
     fsync(fd);
-    printf("\nresponse from server which is not sent: 0   158\n");
-    sprintf(reply, "%d", 0);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = 0;
+    rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return 0;
   }
 
@@ -211,17 +229,14 @@ int MFS_Creat(int pinum, int type, char *name){
 
   itable->inodes[new_inode_num].type = type;
   itable->inodes[new_inode_num].size = 0; 
-   printf("inode num = %d, type = %d,  size = %d",new_inode_num, itable->inodes[new_inode_num].type,itable->inodes[new_inode_num].size);
+   
   for(int i = 0; i< DIRECT_PTRS; i++){
     itable->inodes[new_inode_num].direct[i] = -1;
   }
- printf("parent inode size before: %d", itable->inodes[pinum].size);
+  //updating parent inode size
   itable->inodes[pinum].size += sizeof(dir_ent_t);
-  printf("parent inode size after: %d", itable->inodes[pinum].size);
-
+ 
    memcpy(inode_index, itable, sizeof(inode_block));
-
-  fsync(fd);
 
   int parent_dir = (itable->inodes[pinum].direct[0]);
   dir_block_t * parent_di = (void *) (image + (parent_dir)* UFS_BLOCK_SIZE);
@@ -252,6 +267,8 @@ int MFS_Creat(int pinum, int type, char *name){
       break;
     }
   }
+  printf("inode num = %d, type = %d,  size = %d",new_inode_num, itable->inodes[new_inode_num].type,itable->inodes[new_inode_num].size);
+ 
   itable->inodes[new_inode_num].type = type;
   itable->inodes[new_inode_num].size = 2 * sizeof(dir_ent_t); // in bytes
   itable->inodes[new_inode_num].direct[0] =  sup->data_region_addr + new_data_num; 
@@ -308,12 +325,16 @@ int MFS_Creat(int pinum, int type, char *name){
   fsync(fd);
 
   printf("\n end response from server which is not sent: 0\n");
-  sprintf(reply, "%d", 0);
-  rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+  // sprintf(reply, "%d", 0);
+  // rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+   reply.retCode = 0;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
+   
   return 0;
 }
 int MFS_Unlink(int pinum, char *name){
-  char reply[UFS_BLOCK_SIZE];
+ // char reply[UFS_BLOCK_SIZE];
+ reply.type = MFS_UNLINK;
   int curr_inum, data_block_num, ind_of_child_in_parent_dir;
 
   int parent_dir = (itable->inodes[pinum].direct[0]);// will get parent's directory data blocks
@@ -333,8 +354,8 @@ int fl = 0;
     }
   }
   if(!fl){ 
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return -1;
     }
 
@@ -346,8 +367,9 @@ int fl = 0;
 
     for(int i =2; i <128; i++){
       if(child->entries[i].inum != -1){
-        sprintf(reply, "%d", -1);
-        rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+       
+          reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
         return -1;
       }
     }
@@ -380,56 +402,79 @@ int fl = 0;
 
   }
   fsync(fd);
-  sprintf(reply, "%d", 0);
-  rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+  // sprintf(reply, "%d", 0);
+  // rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = 0;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
  return 0;
 
 }
 
 int MFS_Read(int inum, char *buffer, int offset, int nbytes){
   printf("read called\n\n");
-  char reply[2*UFS_BLOCK_SIZE];
+  //char reply[2*UFS_BLOCK_SIZE];
+  reply.type = MFS_READ;
+
   int chk;
-  if(get_bit(inode_bitmap->bits,inum) == 0){
-       printf("inonde not found error \n\n");
-      sprintf(reply, "%d", -1);
-      rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+  if(get_bit(inode_bitmap->bits,inum) == 0 || (offset + nbytes) > ((sup->num_data)* UFS_BLOCK_SIZE)){
+       printf("inode not found error \n\n");
+      // sprintf(reply, "%d", -1);
+      // rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+      reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
       return -1;
     }
   
   chk = itable->inodes[inum].direct[0];
   
   int size = itable->inodes[inum].size;
-  printf("read called 368 \n\n");
 
-  if(chk == 0 || chk == -1 || offset < 0 || offset > size || nbytes > UFS_BLOCK_SIZE || nbytes < 0){
-     printf("multiple read conditions fialed  \n\n");
-    sprintf(reply, "%d", -1);
-    rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+  if(chk == 0 || chk == -1 || offset < 0 || (offset+nbytes) > size || nbytes > UFS_BLOCK_SIZE || nbytes < 0){
+     printf("multiple read conditions failed  \n\n");
+    // sprintf(reply, "%d", -1);
+    // rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return -1;
   }
-  char *read = (void *) (image + (sup->data_region_addr + chk )* UFS_BLOCK_SIZE + offset);
+  char *read = (void *) (image + (sup->data_region_addr + chk )* UFS_BLOCK_SIZE/* + offset*/);
 
   memcpy(buffer, read, nbytes);
 
   printf("buffer from read: %s\n", buffer);
-  sprintf(reply, "%d~%s", 0, buffer);
-  rc = UDP_Write(sd, &s, reply, 2*UFS_BLOCK_SIZE);
+  // sprintf(reply, "%d~%s", 0, buffer);
+  // rc = UDP_Write(sd, &s, reply, 2*UFS_BLOCK_SIZE);
+  reply.retCode = 0;
+     
+  memcpy(reply.buffer, buffer, nbytes);
+
+  rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
   return 0;
 }
 
 int MFS_Write(int inum, char *buffer, int offset, int nbytes){
-  char reply[2*UFS_BLOCK_SIZE];
+ 
+  reply.type = MFS_WRITE;
   char *write_buf;
   int chk;
-    if(get_bit(inode_bitmap->bits,inum) == 0 || nbytes > UFS_BLOCK_SIZE || nbytes < 0 || offset < 0 ){
+  printf("\n buffer inside mfs_write function in server: ");
+   for(int i=0;i<nbytes;i++){
+   printf("%c",buffer[i]);
+   }
+    printf("\n");
+
+    if(get_bit(inode_bitmap->bits,inum) == 0 || nbytes > UFS_BLOCK_SIZE || nbytes < 0 || offset < 0 || (offset + nbytes) > ((sup->num_data) * UFS_BLOCK_SIZE) ){
+     
+     reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
       return -1;
     }
   chk = itable->inodes[inum].direct[0];
   int type = itable->inodes[inum].type;
+
   if( type == UFS_DIRECTORY){
-    sprintf(reply, "%d", -1);
-   rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+     reply.retCode = -1;
+     rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
     return -1;
   }
   
@@ -455,37 +500,35 @@ int MFS_Write(int inum, char *buffer, int offset, int nbytes){
    memcpy(inode_index, itable, sizeof(inode_block));
 
   write_buf = (void *) (image + (sup->data_region_addr + new_data_num )* UFS_BLOCK_SIZE + offset);
-  if(offset + nbytes > UFS_BLOCK_SIZE){
-    //create new block and write remaining bytes to tat block
-  }
-  else{
+  
     memcpy(write_buf, buffer, nbytes);
-  }
+  
 
   }
   //write from offset
   else{
     write_buf = (void *) (image + (sup->data_region_addr + chk )* UFS_BLOCK_SIZE + offset);
-    if(offset + nbytes > UFS_BLOCK_SIZE){
-      //create new block and write remaining bytes to tat block
-    }
-    else{
+   
       memcpy(write_buf, buffer, nbytes);
-    }
+      
   }
   fsync(fd);
-  sprintf(reply, "%d~%s", 0, write_buf);
-  rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+  // sprintf(reply, "%d~%s", 0, write_buf);
+  // rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+    reply.retCode = 0;
+    rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
+    //memcpy(reply.buffer, write_buf, nbytes);
   return 0;
 }
 
 int MFS_Shutdown(){
-  char reply[UFS_BLOCK_SIZE];
-
+  //char reply[UFS_BLOCK_SIZE];
+  reply.type = MFS_SHUTDOWN;
   printf("shutdown done!\n");
   fsync(fd);
-  sprintf(reply, "%d", 0);
-  rc = UDP_Write(sd, &s, reply, UFS_BLOCK_SIZE);
+  close(fd);
+  reply.retCode = 0;
+  rc = UDP_Write(sd, &s, (char *)&reply, sizeof(MFS_Msg_t));
   exit(0);
 
   return 0;
@@ -604,66 +647,56 @@ int main(int argc, char* argv[]){
 
 char  *args[4];
     while (1) {
-		char buffer[2*UFS_BLOCK_SIZE];
-		rc = UDP_Read(sd, &s, buffer, UFS_BLOCK_SIZE);
+		MFS_Msg_t msg;
+    rc = UDP_Read(sd, &s, (char *)&msg, sizeof(MFS_Msg_t));
+		//rc = UDP_Read(sd, &s, buffer, UFS_BLOCK_SIZE);
 		if (rc > 0) {
-			printf("SERVER:: read %d bytes (message: '%s')\n", rc, buffer);
-      int c = atoi(strtok(buffer, "~"));
+		//	printf("SERVER:: read %d bytes (message: '%s')\n", rc, msg);
+     // int c = atoi(strtok(buffer, "~"));
     
-			switch(c) {
+			switch(msg.type) {
         
-				case 0:
-        printf("its in case 0 mkdir");
-					args[0] = strtok(NULL, "~");
-					args[1] = strtok(NULL, "~");
-					MFS_Lookup(atoi(args[0]), args[1]);
+				case MFS_LOOKUP:
+					// args[0] = strtok(NULL, "~");
+					// args[1] = strtok(NULL, "~");
+					MFS_Lookup(msg.inum, msg.buffer);
 					break;
-				case 1:
-					args[0] = strtok(NULL, "~");//inum
-          MFS_Stat_t *m;
-					MFS_Stat(atoi(args[0]), m);
+				case MFS_STAT:
+					// args[0] = strtok(NULL, "~");//inum
+          MFS_Stat_t *m ;//= malloc(4096);
+					MFS_Stat(msg.inum, m);
 					break;
-				case 2:
-					args[0] = strtok(NULL, "~");
-          args[1] = strtok(NULL, "~");
-					args[2] = strtok(NULL, "~");
-          args[3] = strtok(NULL, "~");
+				case MFS_WRITE:
+					// args[0] = strtok(NULL, "~");
+          // args[1] = strtok(NULL, "~");
+					// args[2] = strtok(NULL, "~");
+          // args[3] = strtok(NULL, "~");
 					// char *writeBuffer = malloc(UFS_BLOCK_SIZE);
 					// rc = UDP_Read(sd, &s, writeBuffer, UFS_BLOCK_SIZE);
 					// if (rc > 0) {
 					// 	args[1] = writeBuffer;
 					// 	MFS_Write(atoi(args[0]), args[1], atoi(args[2]), atoi(args[3]));
 					// }
-          printf("size of buf %ld",strlen(args[1]));
-          MFS_Write(atoi(args[0]), args[1], atoi(args[2]), atoi(args[3]));
+          printf("msg.buffer in write = %s\n",msg.buffer);
+          MFS_Write(msg.inum, msg.buffer, msg.offset, msg.nbytes);
 					break;
-				case 3: 
-					args[0] = strtok(NULL, "~");//pinum
-          args[2] = strtok(NULL, "~");//offset
-					args[3] = strtok(NULL, "~");//nbytes
-
-          printf("inside read: inum =%d offset = %d nbytes = %d\n", atoi(args[0]), atoi(args[2]), atoi(args[3]));
-
-          char *readBuffer = malloc(UFS_BLOCK_SIZE);
-          //rc = UDP_Read(sd, &s, readBuffer, 2*UFS_BLOCK_SIZE);
-					if (rc > 0) {
-          args[1] = readBuffer;
-				//	MFS_Read(atoi(args[0]), args[1], atoi(args[2]), atoi(args[3]));
-          MFS_Read(atoi(args[0]), readBuffer, atoi(args[2]), atoi(args[3]));
-          }
+				case MFS_READ: 
+					 printf("msg.buffer in read = %s\n",msg.buffer);
+          MFS_Read(msg.inum, msg.buffer, msg.offset, msg.nbytes);
+          
 					break; 
-				case 4:
-					args[0] = strtok(NULL, "~");
-					args[1] = strtok(NULL, "~");
-					args[2] = strtok(NULL, "~");
-					MFS_Creat(atoi(args[0]), atoi(args[1]), args[2]);
+				case MFS_CREAT:
+					// args[0] = strtok(NULL, "~");
+					// args[1] = strtok(NULL, "~");
+					// args[2] = strtok(NULL, "~");
+					MFS_Creat(msg.inum, msg.fileType, msg.buffer);
 					break;
-				case 5: 
-					args[0] = strtok(NULL, "~");
-					args[1] = strtok(NULL, "~");
-					MFS_Unlink(atoi(args[0]), args[1]);
+				case MFS_UNLINK: 
+					// args[0] = strtok(NULL, "~");
+					// args[1] = strtok(NULL, "~");
+					MFS_Unlink(msg.inum, msg.buffer);
 					break;
-				case 6:
+				case MFS_SHUTDOWN:
 					MFS_Shutdown();
 					break;
 			}

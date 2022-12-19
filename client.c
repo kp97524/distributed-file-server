@@ -12,13 +12,6 @@ int main(int argc, char* argv[]){
     message_t m;
     MFS_Stat_t *m1 = malloc(UFS_BLOCK_SIZE);
 
-   /* printf("Client send message %d , msg %s\n", m.mtype, m.str);
-    rc = UDP_Write(sd, &addrSnd, (char *)&m, sizeof(message_t));
-    if(rc<0){
-        printf("Client failed to send\n");
-        exit(1);
-    }
-    printf("Client wait for reply...\n");*/
     MFS_Init("localhost", 10005);
 
     /*
@@ -36,17 +29,13 @@ int main(int argc, char* argv[]){
 
     */
 
-     MFS_Creat(0,UFS_REGULAR_FILE, "file1.txt");
-    char * buff = "BUFFER";
-    int write_rc= MFS_Write(1,buff,0,4096);
-    printf("\n write retur %d\n",write_rc);
-    char * data = malloc(50000);
-    int rd_rc = MFS_Read(1,data,0,4096);
-    printf("\nread retur %d\n",rd_rc);
-    printf("\ndata read %s \n",data);
+    int cr = MFS_Creat(0,UFS_REGULAR_FILE, "testdir");
+    int lk = MFS_Lookup(0 , "testdir");
+    printf("create ret = %d , testdir inum/lkup = %d\n", cr, lk);
 
-    //rc = UDP_Read(sd,&addrRcv, (char *)&m, sizeof(message_t));
-    //printf("Client got reply [size: %d rc %d type: %d %s]\n", rc, m.rc, m.mtype, m.str);
+    cr = MFS_Creat(lk, UFS_REGULAR_FILE, "testfile");
+    printf("\n create ret = %d\n",cr);
+    
 
     return 0;
 }
